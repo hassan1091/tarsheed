@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tarsheed/screens/main/main_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,39 +10,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const primary = Color(0xFF007FFF);
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Tarsheed',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF007FFF)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: primary,
+          background: const Color(0x2e2e3eff),
+          brightness: Brightness.dark,
+        ),
+        appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent),
+        filledButtonTheme: const FilledButtonThemeData(
+          style: ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8))))),
+        ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Flutter Demo Home Page'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('ًًHello'),
-            Text(
-              'World',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
+      home: const MainScreen(),
     );
   }
 }
