@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:tarsheed/helper/field_validation.dart';
-import 'package:tarsheed/screens/signup/signup_screen.dart';
+import 'package:tarsheed/screens/login/login_screen.dart';
 import 'package:tarsheed/widgets/my_text_form_field.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -21,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tarsheed'),
+        title: const Text('Sign up'),
       ),
       body: Center(
         child: Form(
@@ -30,12 +31,20 @@ class _LoginScreenState extends State<LoginScreen> {
             shrinkWrap: true,
             children: [
               MyTextFormField(
+                label: "Username",
+                hint: "user123",
+                validator: FieldValidation.validateRequired,
+                controller: _usernameController,
+                type: TextInputType.text,
+                autofocus: true,
+              ),
+              const Gap(16),
+              MyTextFormField(
                 label: "Email",
                 hint: "user123@mail.com",
                 validator: FieldValidation.validateEmail,
                 controller: _emailController,
                 type: TextInputType.emailAddress,
-                autofocus: true,
               ),
               const Gap(16),
               MyTextFormField(
@@ -64,15 +73,15 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void loginPressed() {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-  }
-
-  void signupPressed() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const SignupScreen(),
+        builder: (context) => const LoginScreen(),
       ),
     );
+  }
+
+  void signupPressed() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
   }
 }

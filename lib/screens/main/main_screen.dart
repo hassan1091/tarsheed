@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tarsheed/screens/login/login_screen.dart';
+import 'package:tarsheed/screens/signup/signup_screen.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -26,7 +27,7 @@ class MainScreen extends StatelessWidget {
                 child: const Text("Login"),
               ),
               FilledButton.tonal(
-                onPressed: signupPressed,
+                onPressed: () => signupPressed(context),
                 child: const Text("Sign up"),
               )
             ],
@@ -45,5 +46,12 @@ class MainScreen extends StatelessWidget {
     );
   }
 
-  void signupPressed() {}
+  void signupPressed(context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SignupScreen(),
+      ),
+    );
+  }
 }
