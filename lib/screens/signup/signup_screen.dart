@@ -55,14 +55,14 @@ class _SignupScreenState extends State<SignupScreen> {
                 isPassword: true,
               ),
               const Gap(16),
-              FilledButton(
-                onPressed: loginPressed,
-                child: const Text("Login"),
+              FilledButton.tonal(
+                onPressed: signupPressed,
+                child: const Text("Sign up"),
               ),
               Align(
-                child: FilledButton.tonal(
-                  onPressed: signupPressed,
-                  child: const Text("Sign up"),
+                child: FilledButton(
+                  onPressed: loginPressed,
+                  child: const Text("Login"),
                 ),
               )
             ],
