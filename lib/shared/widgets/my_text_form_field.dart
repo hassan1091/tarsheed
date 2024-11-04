@@ -19,6 +19,7 @@ class MyTextFormField extends StatefulWidget {
     this.onEditingComplete,
     this.icon,
   });
+
   final String label;
   final TextEditingController? controller;
   final String? hint;
@@ -75,7 +76,8 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
                   : widget.icon != null && widget.isInlineIcon
                       ? IconButton(
                           onPressed: widget.onTap,
-                          icon: widget.icon!)
+                          icon: widget.icon!,
+                        )
                       : null,
           hintText: widget.hint),
       autofocus: widget.autofocus,

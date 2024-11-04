@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:tarsheed/core/constants/app_constants.dart';
 import 'package:tarsheed/core/utils/field_validation.dart';
 import 'package:tarsheed/modules/home/home_screen.dart';
 import 'package:tarsheed/modules/signup/signup_screen.dart';
