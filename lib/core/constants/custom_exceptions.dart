@@ -6,6 +6,10 @@ sealed class CustomException implements Exception {
   @override
   String toString() => message;
 }
+/// Exception for uncategorized or general exception
+class PublicException extends CustomException {
+  const PublicException(super.message);
+}
 
 /// Exception for weak passwords.
 class WeakPasswordException extends CustomException {
@@ -17,5 +21,19 @@ class WeakPasswordException extends CustomException {
 class EmailAlreadyInUseException extends CustomException {
   const EmailAlreadyInUseException(
       {String message = 'Email is already in use.'})
+      : super(message);
+}
+
+/// Exception for when a user is not found in the system.
+class UserNotFoundException extends CustomException {
+  const UserNotFoundException(
+      {String message = 'No user found for that email.'})
+      : super(message);
+}
+
+/// Exception for incorrect password attempts.
+class WrongPasswordException extends CustomException {
+  const WrongPasswordException(
+      {String message = 'Wrong password provided for that user.'})
       : super(message);
 }
