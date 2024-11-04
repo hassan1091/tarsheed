@@ -27,4 +27,36 @@ class AuthFirebaseService {
       rethrow;
     }
   }
+
+  Future<UserCredential> login(emailAddress, password) async {
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailAddress,
+        password: password,
+      );
+      return credential;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw const UserNotFoundException(
+            message: 'No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        throw const WrongPasswordException(
+            message: 'Wrong password provided for that user.');
+      } else {
+        throw FirebaseAuthException;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+    } on FirebaseAuthException catch (e) {
+      throw PublicException(e.code);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
