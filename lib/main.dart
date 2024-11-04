@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:tarsheed/firebase_options.dart';
+import 'package:tarsheed/screens/home/home_screen.dart';
 import 'package:tarsheed/screens/main/main_screen.dart';
 
 Future<void> main() async {
@@ -8,6 +10,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
   runApp(const MyApp());
 }
 
@@ -33,7 +36,9 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MainScreen(),
+      home: FirebaseAuth.instance.currentUser == null
+          ? const MainScreen()
+          : const HomeScreen(),
     );
   }
 }
