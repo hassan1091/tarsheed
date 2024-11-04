@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tarsheed/services/firebase/auth_firebase_service.dart';
+import 'package:tarsheed/core/constants/custom_exceptions.dart';
 
 class FirebaseService {
   Future<UserCredential> signup(username, emailAddress, password) async {
