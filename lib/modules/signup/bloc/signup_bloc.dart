@@ -16,7 +16,7 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
     emit(SignupLoadingState());
 
     try {
-      await FirebaseService()
+      await AuthFirebaseService()
           .signup(event.username, event.email, event.password);
       emit(SignupSuccessState());
     } on CustomException catch (e) {
