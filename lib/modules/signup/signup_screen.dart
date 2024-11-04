@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:tarsheed/helper/field_validation.dart';
-import 'package:tarsheed/screens/login/login_screen.dart';
-import 'package:tarsheed/widgets/my_text_form_field.dart';
+import 'package:tarsheed/core/utils/field_validation.dart';
+import 'package:tarsheed/modules/login/login_screen.dart';
+import 'package:tarsheed/shared/widgets/my_text_form_field.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});

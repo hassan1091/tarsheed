@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:tarsheed/firebase_options.dart';
-import 'package:tarsheed/screens/home/home_screen.dart';
-import 'package:tarsheed/screens/main/main_screen.dart';
+import 'package:tarsheed/config//firebase_options.dart';
+import 'package:tarsheed/core/constants/app_constants.dart';
+import 'package:tarsheed/modules/home/home_screen.dart';
+import 'package:tarsheed/modules/main/main_screen.dart';
+import 'package:tarsheed/shared/themes/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,23 +21,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFF007FFF);
     return MaterialApp(
-      title: 'Tarsheed',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: primary,
-          background: const Color(0x2e2e3eff),
-          brightness: Brightness.dark,
-        ),
-        appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent),
-        filledButtonTheme: const FilledButtonThemeData(
-          style: ButtonStyle(
-              shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(8))))),
-        ),
-        useMaterial3: true,
-      ),
+      title: AppConstants.appName,
+      theme: AppTheme.darkTheme,
       home: FirebaseAuth.instance.currentUser == null
           ? const MainScreen()
           : const HomeScreen(),

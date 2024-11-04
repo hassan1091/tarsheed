@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tarsheed/screens/home/views/home_view.dart';
+import 'package:tarsheed/core/constants/app_constants.dart';
+import 'package:tarsheed/modules/home/views/home_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Align(
           alignment: Alignment.center,
-          child: Text('Tarsheed'),
+          child: Text(AppConstants.appName),
         ),
         actions: [
           IconButton(

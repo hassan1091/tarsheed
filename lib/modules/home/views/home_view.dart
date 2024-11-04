@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:tarsheed/widgets/gradient_card.dart';
+import 'package:tarsheed/shared/widgets/gradient_card.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});

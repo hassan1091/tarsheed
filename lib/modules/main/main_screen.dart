@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tarsheed/screens/login/login_screen.dart';
-import 'package:tarsheed/screens/signup/signup_screen.dart';
+import 'package:tarsheed/core/constants/app_constants.dart';
+import 'package:tarsheed/modules/login/login_screen.dart';
+import 'package:tarsheed/modules/signup/signup_screen.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -10,7 +11,7 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tarsheed'),
+        title: const Text(AppConstants.appName),
       ),
       body: Center(
         child: SingleChildScrollView(
