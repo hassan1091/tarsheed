@@ -45,4 +45,16 @@ class FirebaseService {
       rethrow;
     }
   }
+
+  Future<List<Device>> toggleDeviceStatus(Device device, bool value) async {
+    try {
+      await db
+          .collection("devices")
+          .doc(device.id)
+          .update({"status": value ? "on" : "off"});
+      return await getUserDevices();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
