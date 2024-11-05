@@ -5,6 +5,12 @@ sealed class HomeEvent extends Equatable {
   List<Device> get props => [];
 }
 
+class AddLinkHomeEvent extends HomeEvent {
+  final String deviceId;
+
+  AddLinkHomeEvent(this.deviceId);
+}
+
 class LoadHomeEvent extends HomeEvent {}
 
 class ToggleSwitchEvent extends HomeEvent {

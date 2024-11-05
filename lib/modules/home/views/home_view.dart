@@ -29,7 +29,13 @@ class HomeView extends StatelessWidget {
                 indent: 50,
                 endIndent: 50,
               ),
-              const Gap(8),
+              IconButton(
+                  onPressed: () => _addLink(context),
+                  icon: const Icon(
+                    Icons.add_link,
+                    size: 42,
+                    color: Colors.white,
+                  )),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const ClampingScrollPhysics(
@@ -62,6 +68,44 @@ class HomeView extends StatelessWidget {
 
   Future<void> _refresh(BuildContext context) async {
     context.read<HomeBloc>().add(LoadHomeEvent());
+  }
+
+  void _addLink(BuildContext context) {
+    String input = "";
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => SimpleDialog(
+        title: const Text("Link New Device"),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        backgroundColor: Theme.of(context).primaryColor,
+        children: [
+          const Text("Device Code"),
+          TextFormField(
+            onChanged: (value) {
+              input = value;
+            },
+          ),
+          const Gap(2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the Simple Dialog
+                  },
+                  child: const Text("cancel")),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the Simple Dialog
+                    context.read<HomeBloc>().add(AddLinkHomeEvent(input));
+                  },
+                  child: const Text("confirm")),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
 
