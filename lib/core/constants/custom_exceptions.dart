@@ -6,9 +6,16 @@ sealed class CustomException implements Exception {
   @override
   String toString() => message;
 }
+
 /// Exception for uncategorized or general exception
 class PublicException extends CustomException {
   const PublicException(super.message);
+}
+
+/// Exception for device link to the same user exists
+class DeviceLinkExistsException extends CustomException {
+  const DeviceLinkExistsException(
+      {String message = "Device link already exists."});
 }
 
 /// Exception for weak passwords.
