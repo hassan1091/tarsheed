@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:tarsheed/core/constants/app_constants.dart';
 import 'package:tarsheed/core/constants/custom_exceptions.dart';
 import 'package:tarsheed/modules/home/views/home_view.dart';
+import 'package:tarsheed/modules/home/views/report_view.dart';
+import 'package:tarsheed/modules/home/views/routines_view.dart';
 import 'package:tarsheed/modules/main/main_screen.dart';
 import 'package:tarsheed/services/firebase/auth_firebase_service.dart';
 
@@ -50,9 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         children: const [
-          Text("Routines"),
+          RoutinesView(),
           HomeView(),
-          Text("Report"),
+          ReportView(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
