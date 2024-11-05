@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:tarsheed/models/device.dart';
+import 'package:tarsheed/modules/home/blocs/home_bloc/home_bloc.dart';
+import 'package:tarsheed/shared/themes/app_theme.dart';
 import 'package:tarsheed/shared/widgets/gradient_card.dart';
 
 class HomeView extends StatelessWidget {
@@ -7,30 +11,51 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Example
-    return ListView(
-      children: [
-        const _EnergyCard(usage: 0),
-        const Gap(8),
-        const Divider(
-          thickness: 0.5,
-          indent: 50,
-          endIndent: 50,
-        ),
-        const Gap(8),
-        GridView.builder(
-          shrinkWrap: true,
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 215),
-          itemBuilder: (context, index) => const _DeviceCard(
-            isOn: true,
-            name: "Light",
-            description: "Phillips hue",
+    return BlocConsumer<HomeBloc, HomeState>(
+      listener: _homeListener,
+      builder: (context, state) {
+        return RefreshIndicator(
+          onRefresh: () => _refresh(context),
+          child: ListView(
+            children: [
+              const _EnergyCard(usage: 0),
+              const Gap(8),
+              const Divider(
+                thickness: 0.5,
+                indent: 50,
+                endIndent: 50,
+              ),
+              const Gap(8),
+              GridView.builder(
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 215),
+                itemBuilder: (context, index) {
+                  return _DeviceCard(device: state.props[index]);
+                },
+                itemCount: state.props.length,
+              )
+            ],
           ),
-          itemCount: 5,
-        )
-      ],
+        );
+      },
     );
+  }
+
+  void _homeListener(BuildContext context, HomeState state) {
+    if (state is HomeLoadingState) {
+      AppTheme.showLoadingDialog(context);
+    } else if (state is HomeSuccessState) {
+      Navigator.pop(context); // Close the loading dialog
+      AppTheme.showSnackBar(context, 'Device loading successful!');
+    } else if (state is HomeErrorState) {
+      Navigator.pop(context); // Close the loading dialog
+      AppTheme.showSnackBar(context, state.message);
+    }
+  }
+
+  Future<void> _refresh(BuildContext context) async {
+    context.read<HomeBloc>().add(LoadHomeEvent());
   }
 }
 
@@ -67,34 +92,18 @@ class _EnergyCard extends StatelessWidget {
   }
 }
 
-class _DeviceCard extends StatefulWidget {
-  const _DeviceCard(
-      {this.isOn = true,
-      this.name = "Light",
-      this.description = "Phillips hue"});
+class _DeviceCard extends StatelessWidget {
+  const _DeviceCard({
+    required this.device,
+  });
 
-  final bool isOn;
-  final String name;
-  final String description;
-
-  @override
-  State<_DeviceCard> createState() => _DeviceCardState();
-}
-
-class _DeviceCardState extends State<_DeviceCard> {
-  late bool isOn;
-
-  @override
-  void initState() {
-    isOn = widget.isOn;
-    super.initState();
-  }
+  final Device device;
 
   @override
   Widget build(BuildContext context) {
     List<Color> gradientColors;
     Color color;
-    if (isOn) {
+    if (device.isOn()) {
       gradientColors = const [Color(0x3B3A4Fff), Color(0x46475Eff)];
       color = Colors.white;
     } else {
@@ -126,14 +135,14 @@ class _DeviceCardState extends State<_DeviceCard> {
                     color: color,
                   ),
                   Switch.adaptive(
-                    value: isOn,
-                    onChanged: toggleSwitch,
+                    value: device.isOn(),
+                    onChanged: (value) => toggleSwitch(context, value),
                   ),
                 ],
               ),
               const Gap(8),
               Text(
-                widget.name,
+                device.name,
                 style: Theme.of(context)
                     .textTheme
                     .headlineSmall
@@ -141,7 +150,7 @@ class _DeviceCardState extends State<_DeviceCard> {
                 softWrap: true,
               ),
               Text(
-                widget.description,
+                device.description,
                 style: Theme.of(context)
                     .textTheme
                     .bodySmall
@@ -155,9 +164,5 @@ class _DeviceCardState extends State<_DeviceCard> {
     );
   }
 
-  void toggleSwitch(bool value) {
-    setState(() {
-      isOn = value;
-    });
-  }
+  void toggleSwitch(context, value) {}
 }

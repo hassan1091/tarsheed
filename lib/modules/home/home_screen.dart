@@ -1,12 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tarsheed/core/constants/app_constants.dart';
 import 'package:tarsheed/core/constants/custom_exceptions.dart';
+import 'package:tarsheed/modules/home/blocs/home_bloc/home_bloc.dart';
 import 'package:tarsheed/modules/home/views/home_view.dart';
 import 'package:tarsheed/modules/home/views/report_view.dart';
 import 'package:tarsheed/modules/home/views/routines_view.dart';
 import 'package:tarsheed/modules/main/main_screen.dart';
 import 'package:tarsheed/services/firebase/auth_firebase_service.dart';
+import 'package:tarsheed/services/firebase/firebase_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,10 +54,13 @@ class _HomeScreenState extends State<HomeScreen> {
             selectedIndex = index;
           });
         },
-        children: const [
-          RoutinesView(),
-          HomeView(),
-          ReportView(),
+        children: [
+          const RoutinesView(),
+          BlocProvider(
+            create: (context) => HomeBloc()..add(LoadHomeEvent()),
+            child: const HomeView(),
+          ),
+          const ReportView(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -106,5 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void profilePressed(context) {}
+  Future<void> profilePressed(context) async {
+    await FirebaseService().getUserDevices();
+  }
 }
