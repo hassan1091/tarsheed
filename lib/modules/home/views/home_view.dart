@@ -32,6 +32,8 @@ class HomeView extends StatelessWidget {
               const Gap(8),
               GridView.builder(
                 shrinkWrap: true,
+                physics: const ClampingScrollPhysics(
+                    parent: ClampingScrollPhysics()),
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 215),
                 itemBuilder: (context, index) {
