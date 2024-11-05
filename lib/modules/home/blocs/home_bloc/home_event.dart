@@ -6,3 +6,10 @@ sealed class HomeEvent extends Equatable {
 }
 
 class LoadHomeEvent extends HomeEvent {}
+
+class ToggleSwitchEvent extends HomeEvent {
+  final Device device;
+  final bool value;
+
+  ToggleSwitchEvent(this.device, this.value);
+}

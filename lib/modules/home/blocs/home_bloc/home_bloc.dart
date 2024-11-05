@@ -10,12 +10,30 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeInitial()) {
     on<LoadHomeEvent>(_onHomeLoad);
+    on<ToggleSwitchEvent>(_toggleSwitch);
   }
 
   Future<void> _onHomeLoad(LoadHomeEvent event, Emitter<HomeState> emit) async {
     emit(HomeLoadingState());
     try {
       final List<Device> devices = await FirebaseService().getUserDevices();
+      emit(HomeSuccessState(devices: devices));
+    } catch (e, stackTrace) {
+      // Consider logging the error and stack trace for debugging purposes
+      if (kDebugMode) {
+        print("Unexpected error in HomeBloc: $e\n$stackTrace");
+      }
+      emit(const HomeErrorState(
+          "An unexpected error occurred. Please try again later."));
+    }
+  }
+
+  Future<void> _toggleSwitch(
+      ToggleSwitchEvent event, Emitter<HomeState> emit) async {
+    emit(HomeLoadingState());
+    try {
+      final List<Device> devices =
+          await FirebaseService().toggleDeviceStatus(event.device, event.value);
       emit(HomeSuccessState(devices: devices));
     } catch (e, stackTrace) {
       // Consider logging the error and stack trace for debugging purposes

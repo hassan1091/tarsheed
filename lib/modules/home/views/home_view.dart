@@ -134,9 +134,13 @@ class _DeviceCard extends StatelessWidget {
                     size: 48,
                     color: color,
                   ),
-                  Switch.adaptive(
-                    value: device.isOn(),
-                    onChanged: (value) => toggleSwitch(context, value),
+                  BlocBuilder<HomeBloc, HomeState>(
+                    builder: (context, state) {
+                      return Switch.adaptive(
+                        value: device.isOn(),
+                        onChanged: (value) => toggleSwitch(context, value),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -164,5 +168,7 @@ class _DeviceCard extends StatelessWidget {
     );
   }
 
-  void toggleSwitch(context, value) {}
+  void toggleSwitch(BuildContext context, value) {
+    context.read<HomeBloc>().add(ToggleSwitchEvent(device, value));
+  }
 }
