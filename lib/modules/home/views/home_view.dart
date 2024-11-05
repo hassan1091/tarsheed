@@ -14,11 +14,15 @@ class HomeView extends StatelessWidget {
     return BlocConsumer<HomeBloc, HomeState>(
       listener: _homeListener,
       builder: (context, state) {
+        int totalUsage = 0;
+        for (Device d in state.props) {
+          totalUsage += d.usage;
+        }
         return RefreshIndicator(
           onRefresh: () => _refresh(context),
           child: ListView(
             children: [
-              const _EnergyCard(usage: 0),
+              _EnergyCard(usage: totalUsage),
               const Gap(8),
               const Divider(
                 thickness: 0.5,
