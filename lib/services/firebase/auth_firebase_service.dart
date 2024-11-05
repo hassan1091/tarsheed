@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tarsheed/core/constants/custom_exceptions.dart';
+import 'package:tarsheed/models/profile.dart';
+import 'package:tarsheed/services/firebase/firebase_service.dart';
 
 class AuthFirebaseService {
   Future<UserCredential> signup(username, emailAddress, password) async {
@@ -12,6 +14,10 @@ class AuthFirebaseService {
         password: password,
       );
       await credential.user?.updateDisplayName(username);
+      await FirebaseService().createUser(Profile(
+        uid: credential.user!.uid,
+        name: username,
+      ));
       return credential;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
