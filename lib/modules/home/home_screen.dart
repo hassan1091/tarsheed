@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tarsheed/core/constants/app_constants.dart';
 import 'package:tarsheed/core/constants/custom_exceptions.dart';
-import 'package:tarsheed/modules/home/blocs/home_bloc/home_bloc.dart';
 import 'package:tarsheed/modules/home/views/home_view.dart';
 import 'package:tarsheed/modules/home/views/report_view.dart';
 import 'package:tarsheed/modules/home/views/routines_view.dart';
@@ -54,13 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
             selectedIndex = index;
           });
         },
-        children: [
-          const RoutinesView(),
-          BlocProvider(
-            create: (context) => HomeBloc()..add(LoadHomeEvent()),
-            child: const HomeView(),
-          ),
-          const ReportView(),
+        children: const [
+          RoutinesView(),
+          HomeView(),
+          ReportView(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

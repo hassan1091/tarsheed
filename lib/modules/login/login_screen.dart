@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:tarsheed/core/utils/field_validation.dart';
+import 'package:tarsheed/modules/home/blocs/home_bloc/home_bloc.dart';
 import 'package:tarsheed/modules/home/home_screen.dart';
 import 'package:tarsheed/modules/login/bloc/login_bloc.dart';
 import 'package:tarsheed/modules/signup/signup_screen.dart';
@@ -55,7 +56,16 @@ class _LoginScreenState extends State<LoginScreen> {
       _showSnackBar(context, 'Login successful!');
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(
+          builder: (context) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => HomeBloc()..add(LoadHomeEvent()),
+              )
+            ],
+            child: const HomeScreen(),
+          ),
+        ),
         (route) => false,
       );
     } else if (state is LoginErrorState) {
