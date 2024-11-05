@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tarsheed/core/constants/custom_exceptions.dart';
 import 'package:tarsheed/models/device.dart';
 import 'package:tarsheed/models/profile.dart';
 
@@ -41,6 +42,33 @@ class FirebaseService {
           )
           .get();
       return devices.docs.map((e) => e.data()).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<Device>> addDeviceLink(String deviceId) async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+
+      final deviceRef = db.collection("devices").doc(deviceId);
+
+      final querySnapshot = await db
+          .collection("users_has_devices")
+          .where("user_id", isEqualTo: uid)
+          .where("device_id", isEqualTo: deviceRef)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        throw const DeviceLinkExistsException();
+      }
+
+      await db.collection("users_has_devices").add({
+        "device_id": deviceRef,
+        "user_id": uid,
+      });
+
+      return await getUserDevices();
     } catch (e) {
       rethrow;
     }
