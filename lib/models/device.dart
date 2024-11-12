@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Device {
   final String id;
   final String description;
-  final Map<String, dynamic> history;
+  List<DeviceHistory>? history;
   final int usage;
   final String name;
   final String status;
@@ -12,7 +12,7 @@ class Device {
   Device({
     required this.id,
     required this.description,
-    required this.history,
+    this.history,
     required this.usage,
     required this.name,
     required this.status,
@@ -28,7 +28,6 @@ class Device {
     return Device(
       id: doc.id,
       description: data['description'] ?? '',
-      history: data['history'] ?? {},
       usage: data['usage'] ?? 0,
       name: data['name'] ?? '',
       status: data['status'] ?? '',
@@ -45,6 +44,39 @@ class Device {
       'name': device.name,
       'status': device.status,
       'type': device.type,
+    };
+  }
+}
+
+class DeviceHistory {
+  final String id;
+  final int usage;
+  final DateTime createdAt;
+
+  DeviceHistory({
+    required this.id,
+    required this.usage,
+    required this.createdAt,
+  });
+
+  factory DeviceHistory.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> doc, SnapshotOptions? options) {
+    final data = doc.data()!;
+    return DeviceHistory(
+      id: doc.id,
+      usage: data['usage'] ?? 0,
+      createdAt: data['created_at'] != null
+          ? (data['created_at'] as Timestamp).toDate()
+          : DateTime(0),
+    );
+  }
+
+  // Convert a Device instance to Firestore data
+  static Map<String, dynamic> toFirestore(
+      DeviceHistory deviceHistory, SetOptions? options) {
+    return {
+      'usage': deviceHistory.usage,
+      'created_at': deviceHistory.createdAt,
     };
   }
 }
