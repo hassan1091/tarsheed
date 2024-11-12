@@ -36,8 +36,25 @@ class ReportView extends StatelessWidget {
                   Iterable<DeviceHistory> dHs = state.props[index].history!
                       .where((element) =>
                           element.createdAt.year == DateTime.now().year);
-                  List<ChartData> chartDataList =
-                      dHs.map((e) => ChartData(e.createdAt, e.usage)).toList();
+
+                  Map<int, ChartData> monthlyDataMap = {};
+
+                  for (DeviceHistory deviceHistory in dHs) {
+                    int month = deviceHistory.createdAt.month;
+                    if (monthlyDataMap.containsKey(month)) {
+                      monthlyDataMap[month] = ChartData(
+                        deviceHistory.createdAt,
+                        deviceHistory.usage + monthlyDataMap[month]!.yData,
+                      );
+                    } else {
+                      monthlyDataMap[month] = ChartData(
+                          deviceHistory.createdAt, deviceHistory.usage);
+                    }
+                  }
+
+                  List<ChartData> chartDataListTemp =
+                      monthlyDataMap.values.toList();
+
                   return SizedBox(
                     width: double.infinity,
                     child: Column(
@@ -55,7 +72,7 @@ class ReportView extends StatelessWidget {
                           child: Padding(
                             padding:
                                 const EdgeInsets.only(right: 16.0, top: 16.0),
-                            child: _LineChart(data: chartDataList),
+                            child: _LineChart(data: chartDataListTemp),
                           ),
                         ),
                       ],
@@ -172,7 +189,7 @@ class _LineChart extends StatelessWidget {
             getTitlesWidget: (value, meta) {
               if (yAxisIntervals.contains(value.toInt())) {
                 return Text(
-                  '${value.toInt()}m',
+                  '${value.toInt()}',
                   style: const TextStyle(
                       fontWeight: FontWeight.w500, fontSize: 10),
                 );
