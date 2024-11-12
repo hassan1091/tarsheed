@@ -21,7 +21,6 @@ class FirebaseService {
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
 
-      // Query devices based on user ID
       final querySnapshot = await db
           .collection("users_has_devices")
           .where("user_id", isEqualTo: uid)
@@ -33,15 +32,37 @@ class FirebaseService {
       final deviceIds =
           querySnapshot.docs.map((doc) => doc.data()["device_id"].id);
 
-      final devices = await db
-          .collection("devices")
-          .where(FieldPath.documentId, whereIn: deviceIds)
-          .withConverter(
-            fromFirestore: (snapshot, _) => Device.fromFirestore(snapshot, _),
-            toFirestore: (value, _) => Device.toFirestore(value, _),
-          )
-          .get();
-      return devices.docs.map((e) => e.data()).toList();
+      List<Device> devices = [];
+      for (var deviceId in deviceIds) {
+        final deviceDoc = await db
+            .collection("devices")
+            .doc(deviceId)
+            .withConverter(
+              fromFirestore: Device.fromFirestore,
+              toFirestore: Device.toFirestore,
+            )
+            .get();
+
+        if (deviceDoc.exists) {
+          final device = deviceDoc.data()!;
+
+          final historySnapshot = await db
+              .collection("devices")
+              .doc(deviceId)
+              .collection("device_usage")
+              .orderBy("created_at", descending: true)
+              .withConverter(
+                fromFirestore: DeviceHistory.fromFirestore,
+                toFirestore: DeviceHistory.toFirestore,
+              )
+              .get();
+
+          // Convert the history documents to DeviceHistory
+          device.history = historySnapshot.docs.map((e) => e.data()).toList();
+          devices.add(device);
+        }
+      }
+      return devices;
     } catch (e) {
       rethrow;
     }
