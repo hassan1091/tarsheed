@@ -29,7 +29,7 @@ class Device {
       id: doc.id,
       description: data['description'] ?? '',
       history: data['history'] ?? {},
-      usage: int.parse(data['usage'] ?? "0"),
+      usage: data['usage'] ?? 0,
       name: data['name'] ?? '',
       status: data['status'] ?? '',
       type: data['type'] ?? '',
