@@ -16,9 +16,14 @@ class MainScreen extends StatelessWidget {
       body: Center(
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Image.asset(
+                "assets/jic_logo_remove_bg.png",
+                width: 256,
+                height: 256,
+              ),
               const Icon(
                 CupertinoIcons.home,
                 size: 256,
