@@ -11,6 +11,12 @@ class AddLinkHomeEvent extends HomeEvent {
   AddLinkHomeEvent(this.deviceId);
 }
 
+class ChangePeriodicEvent extends HomeEvent {
+  final Periodic currentPeriodic;
+
+  ChangePeriodicEvent(this.currentPeriodic);
+}
+
 class LoadHomeEvent extends HomeEvent {}
 
 class ToggleSwitchEvent extends HomeEvent {
