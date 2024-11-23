@@ -8,3 +8,5 @@ class AppConstants {
   static const Color primaryColor = Color(0xFF007FFF);
   static const Color backgroundColor = Color(0x2E2E3EFF);
 }
+
+enum Periodic { daily, monthly, yearly }
