@@ -44,6 +44,18 @@ class FirebaseService {
     }
   }
 
+  Future<void> updateFcmToken(fcmToken) async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      await db
+          .collection("users")
+          .doc(uid)
+          .set({"fcm_token": fcmToken}, SetOptions(merge: true));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<List<Device>> getUserDevices() async {
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
