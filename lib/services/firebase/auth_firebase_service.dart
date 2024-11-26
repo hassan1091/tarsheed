@@ -1,13 +1,25 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tarsheed/core/constants/custom_exceptions.dart';
 import 'package:tarsheed/models/profile.dart';
 import 'package:tarsheed/services/firebase/firebase_service.dart';
 
 class AuthFirebaseService {
+  final db = FirebaseFirestore.instance;
+
   Future<UserCredential> signup(username, emailAddress, password) async {
     try {
+      final query = await db
+          .collection("users")
+          .where("name", isEqualTo: username)
+          .count()
+          .get();
+      if ((query.count ?? 0) != 0) {
+        throw const UsernameAlreadyInUseException(
+            message: 'The account already exists for that username.');
+      }
       final credential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailAddress,

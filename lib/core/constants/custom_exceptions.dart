@@ -31,6 +31,13 @@ class EmailAlreadyInUseException extends CustomException {
       : super(message);
 }
 
+/// Exception for username already in use.
+class UsernameAlreadyInUseException extends CustomException {
+  const UsernameAlreadyInUseException(
+      {String message = 'Username is already in use.'})
+      : super(message);
+}
+
 /// Exception for when a user is not found in the system.
 class UserNotFoundException extends CustomException {
   const UserNotFoundException(
