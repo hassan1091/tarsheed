@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tarsheed/core/constants/custom_exceptions.dart';
 import 'package:tarsheed/models/device.dart';
 import 'package:tarsheed/models/profile.dart';
+import 'package:tarsheed/models/routine.dart';
 
 class FirebaseService {
   final db = FirebaseFirestore.instance;
@@ -105,5 +106,48 @@ class FirebaseService {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<List<Routine>> getUserRoutines() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+    final querySnapshot = await db
+        .collection("routines")
+        .where("user_id", isEqualTo: uid)
+        .withConverter(
+          fromFirestore: Routine.fromFirestore,
+          toFirestore: Routine.toFirestore,
+        )
+        .get();
+
+    if (querySnapshot.docs.isEmpty) return [];
+
+    final routinesWithDeviceRefs =
+        querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    final deviceFutures = routinesWithDeviceRefs
+        .map((routine) => getDeviceFromDocumentReference(routine.deviceId))
+        .toList();
+
+    final devices = await Future.wait(deviceFutures);
+
+    final routines = routinesWithDeviceRefs
+        .asMap()
+        .entries
+        .map((entry) => entry.value.copyWith(device: devices[entry.key]))
+        .toList();
+
+    return routines;
+  }
+
+  Future<Device?> getDeviceFromDocumentReference(DocumentReference doc) async {
+    final querySnapshot = await doc
+        .withConverter(
+          fromFirestore: Device.fromFirestore,
+          toFirestore: Device.toFirestore,
+        )
+        .get();
+
+    return querySnapshot.data();
   }
 }
