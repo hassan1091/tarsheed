@@ -2,24 +2,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tarsheed/models/device.dart';
 
 class Routine {
-  final String id;
+  final String? id;
   final String name;
   final String description;
   final DocumentReference deviceId;
   final Device? device;
-  final String userId;
+  final String? userId;
   final String action;
   final String condition;
   final String sensor;
   final int value;
 
   Routine({
-    required this.id,
+    this.id,
     required this.name,
     required this.description,
     required this.deviceId,
     this.device,
-    required this.userId,
+    this.userId,
     required this.action,
     required this.condition,
     required this.sensor,

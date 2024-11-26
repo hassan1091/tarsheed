@@ -6,3 +6,9 @@ sealed class RoutinesEvent extends Equatable {
 }
 
 class LoadRoutinesEvent extends RoutinesEvent {}
+
+class UpdateRoutinesEvent extends RoutinesEvent {
+  final Routine routine;
+
+  UpdateRoutinesEvent(this.routine);
+}

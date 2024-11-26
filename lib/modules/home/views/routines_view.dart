@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tarsheed/core/constants/app_constants.dart';
@@ -106,7 +107,7 @@ class RoutinesView extends StatelessWidget {
   }
 
   Future<void> _refresh(BuildContext context) async {
-    context.read<HomeBloc>().add(LoadHomeEvent());
+    context.read<RoutinesBloc>().add(LoadRoutinesEvent());
   }
 
   void _addRoutine(BuildContext context) {
@@ -118,12 +119,18 @@ class RoutinesView extends StatelessWidget {
   }
 
   void _editRoutine(BuildContext context, Routine routine) {
-    Navigator.of(context).push(MaterialPageRoute(
+    Navigator.of(context)
+        .push(MaterialPageRoute(
       builder: (context) => BlocProvider(
         create: (context) => HomeBloc()..add(LoadHomeEvent()),
         child: RoutinesForm(routine: routine),
       ),
-    ));
+    ))
+        .then((value) {
+      if (value is Routine) {
+        context.read<RoutinesBloc>().add(UpdateRoutinesEvent(value));
+      }
+    });
   }
 }
 
@@ -140,6 +147,7 @@ class _RoutinesFormState extends State<RoutinesForm> {
   final _formKey = GlobalKey<FormState>();
 
   late final TextEditingController nameController;
+  late final TextEditingController descriptionController;
   late final TextEditingController deviceController;
   late final TextEditingController actionController;
   late final TextEditingController conditionController;
@@ -149,8 +157,12 @@ class _RoutinesFormState extends State<RoutinesForm> {
   @override
   void initState() {
     nameController = TextEditingController(text: widget.routine?.name);
+    descriptionController =
+        TextEditingController(text: widget.routine?.description);
     deviceController = TextEditingController(
-        text: "${widget.routine?.device?.id}: ${widget.routine?.device?.name}");
+        text: widget.routine == null
+            ? null
+            : "${widget.routine?.device?.id}: ${widget.routine?.device?.name}");
     actionController = TextEditingController(text: widget.routine?.action);
     conditionController =
         TextEditingController(text: widget.routine?.condition);
@@ -178,9 +190,9 @@ class _RoutinesFormState extends State<RoutinesForm> {
                   controller: nameController,
                 ),
                 MyTextFormField(
-                  label: "Device",
+                  label: "Description",
                   validator: FieldValidation.validateRequired,
-                  controller: deviceController,
+                  controller: descriptionController,
                 ),
                 BlocBuilder<HomeBloc, HomeState>(
                   builder: (context, state) {
@@ -256,13 +268,29 @@ class _RoutinesFormState extends State<RoutinesForm> {
     );
   }
 
-  _onSafePressed() {
+  void _onSafePressed() {
     if (!_formKey.currentState!.validate() ||
-        actionController.text.isEmpty ||
+        deviceController.text.isEmpty ||
         conditionController.text.isEmpty ||
         actionController.text.isEmpty ||
         deviceController.text.isEmpty) {
       return;
+    }
+    if (widget.routine != null) {
+      Navigator.pop(
+          context,
+          Routine(
+            id: widget.routine!.id,
+            name: nameController.text,
+            description: descriptionController.text,
+            deviceId: FirebaseFirestore.instance
+                .doc("/devices/${deviceController.text.split(":")[0]}"),
+            userId: widget.routine!.userId,
+            action: actionController.text,
+            condition: conditionController.text,
+            sensor: sensorController.text,
+            value: int.parse(valueController.text),
+          ));
     }
   }
 }

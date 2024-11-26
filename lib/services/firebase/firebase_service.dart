@@ -140,6 +140,14 @@ class FirebaseService {
     return routines;
   }
 
+  Future<List<Routine>> updateRoutines(Routine routine) async {
+    await db
+        .collection("routines")
+        .doc(routine.id)
+        .update(Routine.toFirestore(routine, SetOptions(merge: true)));
+    return await getUserRoutines();
+  }
+
   Future<Device?> getDeviceFromDocumentReference(DocumentReference doc) async {
     final querySnapshot = await doc
         .withConverter(
