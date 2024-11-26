@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:tarsheed/core/utils/field_validation.dart';
 import 'package:tarsheed/modules/home/blocs/home_bloc/home_bloc.dart';
+import 'package:tarsheed/modules/home/blocs/routines_bloc/routines_bloc.dart';
 import 'package:tarsheed/modules/home/home_screen.dart';
 import 'package:tarsheed/modules/login/bloc/login_bloc.dart';
 import 'package:tarsheed/modules/signup/signup_screen.dart';
@@ -61,6 +62,9 @@ class _LoginScreenState extends State<LoginScreen> {
             providers: [
               BlocProvider(
                 create: (context) => HomeBloc()..add(LoadHomeEvent()),
+              ),
+              BlocProvider(
+                create: (context) => RoutinesBloc()..add(LoadRoutinesEvent()),
               )
             ],
             child: const HomeScreen(),

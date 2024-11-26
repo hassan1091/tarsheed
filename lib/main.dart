@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tarsheed/config//firebase_options.dart';
 import 'package:tarsheed/core/constants/app_constants.dart';
 import 'package:tarsheed/modules/home/blocs/home_bloc/home_bloc.dart';
+import 'package:tarsheed/modules/home/blocs/routines_bloc/routines_bloc.dart';
 import 'package:tarsheed/modules/home/home_screen.dart';
 import 'package:tarsheed/modules/main/main_screen.dart';
 import 'package:tarsheed/shared/themes/app_theme.dart';
@@ -32,6 +33,9 @@ class MyApp extends StatelessWidget {
               providers: [
                 BlocProvider(
                   create: (context) => HomeBloc()..add(LoadHomeEvent()),
+                ),
+                BlocProvider(
+                  create: (context) => RoutinesBloc()..add(LoadRoutinesEvent()),
                 )
               ],
               child: const HomeScreen(),
