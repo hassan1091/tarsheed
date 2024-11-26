@@ -12,3 +12,8 @@ class UpdateRoutinesEvent extends RoutinesEvent {
 
   UpdateRoutinesEvent(this.routine);
 }
+class AddRoutinesEvent extends RoutinesEvent {
+  final Routine routine;
+
+  AddRoutinesEvent(this.routine);
+}

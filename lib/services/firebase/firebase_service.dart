@@ -140,11 +140,18 @@ class FirebaseService {
     return routines;
   }
 
-  Future<List<Routine>> updateRoutines(Routine routine) async {
+  Future<List<Routine>> updateRoutine(Routine routine) async {
     await db
         .collection("routines")
         .doc(routine.id)
         .update(Routine.toFirestore(routine, SetOptions(merge: true)));
+    return await getUserRoutines();
+  }
+
+  Future<List<Routine>> addRoutine(Routine routine) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    await db.collection("routines").add(Routine.toFirestore(
+        routine.copyWith(userId: uid), SetOptions(merge: true)));
     return await getUserRoutines();
   }
 

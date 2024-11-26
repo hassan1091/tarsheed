@@ -111,11 +111,18 @@ class RoutinesView extends StatelessWidget {
   }
 
   void _addRoutine(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => BlocProvider(
-              create: (context) => HomeBloc()..add(LoadHomeEvent()),
-              child: const RoutinesForm(),
-            )));
+    Navigator.of(context)
+        .push(MaterialPageRoute(
+      builder: (context) => BlocProvider(
+        create: (context) => HomeBloc()..add(LoadHomeEvent()),
+        child: const RoutinesForm(),
+      ),
+    ))
+        .then((value) {
+      if (value is Routine) {
+        context.read<RoutinesBloc>().add(AddRoutinesEvent(value));
+      }
+    });
   }
 
   void _editRoutine(BuildContext context, Routine routine) {
@@ -239,7 +246,7 @@ class _RoutinesFormState extends State<RoutinesForm> {
                   ],
                 ),
                 DropdownMenu(
-                  label: const Text("Action"),
+                  label: const Text("Sensor"),
                   controller: sensorController,
                   expandedInsets: const EdgeInsets.all(0),
                   dropdownMenuEntries: const [
@@ -253,13 +260,21 @@ class _RoutinesFormState extends State<RoutinesForm> {
                   validator: FieldValidation.validateRequired,
                   controller: valueController,
                 ),
-                IconButton(
-                  onPressed: _onSafePressed,
-                  icon: const Icon(
-                    Icons.save_outlined,
-                    size: 64,
-                  ),
-                )
+                widget.routine != null
+                    ? IconButton(
+                        onPressed: _onSafePressed,
+                        icon: const Icon(
+                          Icons.save_outlined,
+                          size: 64,
+                        ),
+                      )
+                    : IconButton(
+                        onPressed: _onAddPressed,
+                        icon: const Icon(
+                          Icons.add_circle_outline,
+                          size: 64,
+                        ),
+                      )
               ],
             ),
           ),
@@ -276,21 +291,43 @@ class _RoutinesFormState extends State<RoutinesForm> {
         deviceController.text.isEmpty) {
       return;
     }
-    if (widget.routine != null) {
-      Navigator.pop(
-          context,
-          Routine(
-            id: widget.routine!.id,
-            name: nameController.text,
-            description: descriptionController.text,
-            deviceId: FirebaseFirestore.instance
-                .doc("/devices/${deviceController.text.split(":")[0]}"),
-            userId: widget.routine!.userId,
-            action: actionController.text,
-            condition: conditionController.text,
-            sensor: sensorController.text,
-            value: int.parse(valueController.text),
-          ));
+    Navigator.pop(
+      context,
+      Routine(
+        id: widget.routine!.id,
+        name: nameController.text,
+        description: descriptionController.text,
+        deviceId: FirebaseFirestore.instance
+            .doc("/devices/${deviceController.text.split(":")[0]}"),
+        userId: widget.routine!.userId,
+        action: actionController.text,
+        condition: conditionController.text,
+        sensor: sensorController.text,
+        value: int.parse(valueController.text),
+      ),
+    );
+  }
+
+  void _onAddPressed() {
+    if (!_formKey.currentState!.validate() ||
+        deviceController.text.isEmpty ||
+        conditionController.text.isEmpty ||
+        actionController.text.isEmpty ||
+        deviceController.text.isEmpty) {
+      return;
     }
+    Navigator.pop(
+      context,
+      Routine(
+        name: nameController.text,
+        description: descriptionController.text,
+        deviceId: FirebaseFirestore.instance
+            .doc("/devices/${deviceController.text.split(":")[0]}"),
+        action: actionController.text,
+        condition: conditionController.text,
+        sensor: sensorController.text,
+        value: int.parse(valueController.text),
+      ),
+    );
   }
 }
