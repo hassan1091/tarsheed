@@ -9,10 +9,36 @@ import 'package:tarsheed/models/routine.dart';
 
 class FirebaseService {
   final db = FirebaseFirestore.instance;
+  final dbAuth = FirebaseAuth.instance;
 
   Future<void> createUser(Profile profile) async {
     try {
       await db.collection("users").doc(profile.uid).set(profile.toJson());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateUser({String? username, String? email}) async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      if (email != null) {
+        // ignore: deprecated_member_use
+        await dbAuth.currentUser?.updateEmail(email);
+      }
+      if (username != null) {
+        final query = await db
+            .collection("users")
+            .where("name", isEqualTo: username)
+            .count()
+            .get();
+        if ((query.count ?? 0) != 0) {
+          throw const UsernameAlreadyInUseException(
+              message: 'The account already exists for that username.');
+        }
+        await dbAuth.currentUser?.updateDisplayName(username);
+        await db.collection("users").doc(uid).update({"name": username});
+      }
     } catch (e) {
       rethrow;
     }
