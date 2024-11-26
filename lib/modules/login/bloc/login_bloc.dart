@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tarsheed/config/firebase_messaging_service.dart';
 import 'package:tarsheed/core/constants/custom_exceptions.dart';
 import 'package:tarsheed/services/firebase/auth_firebase_service.dart';
 
@@ -17,6 +18,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     try {
       await AuthFirebaseService().login(event.email, event.password);
+      await FirebaseMessagingService.updateFcmToken();
       emit(LoginSuccessState());
     } on CustomException catch (e) {
       emit(LoginErrorState(e.message));
