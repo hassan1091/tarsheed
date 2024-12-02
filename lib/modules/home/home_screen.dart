@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tarsheed/core/constants/app_constants.dart';
 import 'package:tarsheed/core/constants/custom_exceptions.dart';
 import 'package:tarsheed/modules/home/blocs/home_bloc/home_bloc.dart';
-import 'package:tarsheed/modules/home/blocs/routines_bloc/routines_bloc.dart';
 import 'package:tarsheed/modules/home/views/home_view.dart';
 import 'package:tarsheed/modules/home/views/report_view.dart';
 import 'package:tarsheed/modules/home/views/routines_view.dart';
@@ -33,13 +32,11 @@ class _HomeScreenState extends State<HomeScreen> {
       if (message.notification != null) {
         AppTheme.showSnackBar(context, message.notification!.body ?? "");
         context.read<HomeBloc>().add(LoadHomeEvent());
-        context.read<RoutinesBloc>().add(LoadRoutinesEvent());
       }
     });
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       if (message.notification != null) {
         context.read<HomeBloc>().add(LoadHomeEvent());
-        context.read<RoutinesBloc>().add(LoadRoutinesEvent());
       }
     });
     super.initState();
