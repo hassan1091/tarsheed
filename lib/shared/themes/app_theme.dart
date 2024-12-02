@@ -17,6 +17,21 @@ class AppTheme {
     useMaterial3: true,
   );
 
+  static ThemeData safeTheme = ThemeData(
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: AppConstants.safeColor,
+      background: AppConstants.safeBackgroundColor,
+      brightness: Brightness.dark,
+    ),
+    appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent),
+    filledButtonTheme: const FilledButtonThemeData(
+      style: ButtonStyle(
+          shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8))))),
+    ),
+    useMaterial3: true,
+  );
+
   static void showLoadingDialog(BuildContext context) {
     showDialog(
       context: context,
