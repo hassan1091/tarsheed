@@ -16,4 +16,8 @@ final class ProfileErrorState extends ProfileState {
   ProfileErrorState(this.message);
 }
 
-final class ProfileSuccessState extends ProfileState {}
+final class ProfileSuccessState extends ProfileState {
+  final bool? isSafeMode;
+
+  ProfileSuccessState({this.isSafeMode});
+}

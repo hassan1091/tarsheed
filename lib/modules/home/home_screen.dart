@@ -44,6 +44,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isSafeMode = Theme.of(context).colorScheme.background !=
+        AppConstants.safeBackgroundColor;
     return Scaffold(
       appBar: AppBar(
         title: const Align(
@@ -74,6 +76,19 @@ class _HomeScreenState extends State<HomeScreen> {
           ReportView(),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: isSafeMode
+          ? null
+          : const Card(
+              color: Colors.purple,
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  "Safe Mode Is Active",
+                  style: TextStyle(fontWeight: FontWeight.w900),
+                ),
+              ),
+            ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: selectedIndex,

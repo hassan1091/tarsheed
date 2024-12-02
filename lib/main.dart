@@ -11,6 +11,7 @@ import 'package:tarsheed/modules/home/blocs/home_bloc/home_bloc.dart';
 import 'package:tarsheed/modules/home/blocs/routines_bloc/routines_bloc.dart';
 import 'package:tarsheed/modules/home/home_screen.dart';
 import 'package:tarsheed/modules/main/main_screen.dart';
+import 'package:tarsheed/services/firebase/firebase_service.dart';
 import 'package:tarsheed/shared/themes/app_theme.dart';
 
 Future<void> main() async {
@@ -19,7 +20,7 @@ Future<void> main() async {
   await _initializeFirebase();
   FirebaseMessagingService.setupFirebaseMessaging();
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 Future<void> _initializeFirebase() async {
@@ -36,16 +37,33 @@ Future<void> _initializeFirebase() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  static GlobalKey<MyAppState> globalKey = GlobalKey();
+
+  MyApp() : super(key: globalKey);
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> {
+  ThemeData _currentTheme = AppTheme.darkTheme;
+
+  void updateTheme(ThemeData newTheme) {
+    setState(() {
+      _currentTheme = newTheme;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    if (FirebaseAuth.instance.currentUser != null) {
+      FirebaseService().getUser().then((value) {
+        if (value.isSafeMode) {
+          updateTheme(AppTheme.safeTheme);
+        }
+      });
+    }
     _requestFirebasePermissions();
   }
 
@@ -73,7 +91,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: AppConstants.appName,
-      theme: AppTheme.darkTheme,
+      theme: _currentTheme,
       home: FirebaseAuth.instance.currentUser == null
           ? const MainScreen()
           : MultiBlocProvider(

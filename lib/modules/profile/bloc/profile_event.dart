@@ -8,3 +8,5 @@ class ProfileSubmittedEvent extends ProfileEvent {
 
   ProfileSubmittedEvent({this.email, this.username});
 }
+
+class SaveModeToggle extends ProfileEvent {}

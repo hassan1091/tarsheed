@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:tarsheed/core/constants/app_constants.dart';
 import 'package:tarsheed/core/utils/field_validation.dart';
+import 'package:tarsheed/main.dart';
 import 'package:tarsheed/modules/profile/bloc/profile_bloc.dart';
+import 'package:tarsheed/shared/themes/app_theme.dart';
 import 'package:tarsheed/shared/widgets/my_text_form_field.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -95,30 +98,47 @@ class _ProfileForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Form(
-        key: formKey,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            MyTextFormField(
-              label: "Username",
-              validator: FieldValidation.validateRequired,
-              controller: usernameController,
-            ),
-            const Gap(16),
-            MyTextFormField(
-              label: "Email",
-              validator: FieldValidation.validateEmail,
-              controller: emailController,
-              type: TextInputType.emailAddress,
-            ),
-            const Gap(16),
-            FilledButton(
-              onPressed: () => profilePressed(context),
-              child: const Text("Update Profile Info"),
-            ),
-          ],
+    final isSafeMode = Theme.of(context).colorScheme.background ==
+        AppConstants.safeBackgroundColor;
+    return BlocListener<ProfileBloc, ProfileState>(
+      listener: (context, state) {
+        if (state is ProfileSuccessState && state.isSafeMode != null) {
+          MyApp.globalKey.currentState?.updateTheme(
+            state.isSafeMode! ? AppTheme.safeTheme : AppTheme.darkTheme,
+          );
+        }
+      },
+      child: Center(
+        child: Form(
+          key: formKey,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              MyTextFormField(
+                label: "Username",
+                validator: FieldValidation.validateRequired,
+                controller: usernameController,
+              ),
+              const Gap(16),
+              MyTextFormField(
+                label: "Email",
+                validator: FieldValidation.validateEmail,
+                controller: emailController,
+                type: TextInputType.emailAddress,
+              ),
+              const Gap(16),
+              Switch(
+                value: isSafeMode,
+                onChanged: (_) {
+                  context.read<ProfileBloc>().add(SaveModeToggle());
+                },
+              ),
+              FilledButton(
+                onPressed: () => profilePressed(context),
+                child: const Text("Update Profile Info"),
+              ),
+            ],
+          ),
         ),
       ),
     );
