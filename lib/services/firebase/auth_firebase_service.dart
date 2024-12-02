@@ -52,6 +52,7 @@ class AuthFirebaseService {
         email: emailAddress,
         password: password,
       );
+      await FirebaseService().getUser();
       return credential;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tarsheed/config/app_local_storage.dart';
 import 'package:tarsheed/core/constants/custom_exceptions.dart';
 import 'package:tarsheed/models/device.dart';
 import 'package:tarsheed/models/profile.dart';
@@ -11,6 +12,22 @@ class FirebaseService {
   final db = FirebaseFirestore.instance;
   final dbAuth = FirebaseAuth.instance;
 
+  Future<Profile> getUser() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      final querySnapshot = await db.collection("users").doc(uid).get();
+      await AppLocalStorage.setBool(
+          AppStorageKey.safeMode, querySnapshot['is_safe_mode'] ?? false);
+      return Profile(
+        uid: uid,
+        name: querySnapshot['name'],
+        isSafeMode: querySnapshot['is_safe_mode'] ?? false,
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> createUser(Profile profile) async {
     try {
       await db.collection("users").doc(profile.uid).set(profile.toJson());
@@ -19,7 +36,8 @@ class FirebaseService {
     }
   }
 
-  Future<void> updateUser({String? username, String? email}) async {
+  Future<void> updateUser(
+      {String? username, String? email, bool? isSafeMode}) async {
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
       if (email != null) {
@@ -38,6 +56,14 @@ class FirebaseService {
         }
         await dbAuth.currentUser?.updateDisplayName(username);
         await db.collection("users").doc(uid).update({"name": username});
+      }
+
+      if (isSafeMode != null) {
+        await db
+            .collection("users")
+            .doc(uid)
+            .update({"is_safe_mode": isSafeMode});
+        await AppLocalStorage.setBool(AppStorageKey.safeMode, isSafeMode);
       }
     } catch (e) {
       rethrow;
