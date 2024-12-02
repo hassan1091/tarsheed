@@ -233,16 +233,25 @@ class _RoutinesFormState extends State<RoutinesForm> {
                   controller: conditionController,
                   expandedInsets: const EdgeInsets.all(0),
                   dropdownMenuEntries: const [
-                    DropdownMenuEntry(value: "Equal to", label: "Equal to"),
                     DropdownMenuEntry(
-                        value: "Greater Than", label: "Greater Than"),
+                      value: "Equal to",
+                      label: "Equal to",
+                    ),
                     DropdownMenuEntry(
-                        value: "Greater Than",
+                      value: "Greater Than",
+                      label: "Greater Than",
+                    ),
+                    DropdownMenuEntry(
+                        value: "Greater Than Or Equal to",
                         label: "Greater Than Or Equal to"),
                     DropdownMenuEntry(
-                        value: "Greater Than", label: "Less Than"),
+                      value: "Less Than Or Equal to",
+                      label: "Less Than Or Equal to",
+                    ),
                     DropdownMenuEntry(
-                        value: "Greater Than", label: "Less Than Or Equal to"),
+                      value: "Less Than",
+                      label: "Less Than",
+                    ),
                   ],
                 ),
                 DropdownMenu(
