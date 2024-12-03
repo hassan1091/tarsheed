@@ -11,27 +11,55 @@ import 'package:tarsheed/shared/themes/app_theme.dart';
 class ReportView extends StatelessWidget {
   const ReportView({super.key});
 
+  List<DeviceHistory> getAllDevicesHistory(List<Device> devices) => devices
+      .where((device) => device.history != null)
+      .expand((device) => device.history!)
+      .toList();
+
+  Device getAllDevicesInOne(List<DeviceHistory> hs) => Device(
+        id: "All Devices",
+        description: "",
+        usage: 0,
+        name: "",
+        status: "",
+        type: "",
+        history: hs,
+      );
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeBloc, HomeState>(
       listener: _homeListener,
       builder: (context, state) {
+        Device allDevicesInOne =
+            getAllDevicesInOne(getAllDevicesHistory(state.props));
+
+        final Widget allDevicesLineChart = switch (state.periodic) {
+          Periodic.daily =>
+            _DailyLineChart(data: _dailyChartData(allDevicesInOne)),
+          Periodic.monthly =>
+            _MonthlyLineChart(data: _monthlyChartData(allDevicesInOne)),
+          Periodic.yearly =>
+            _YearlyLineChart(data: _yearlyChartData(allDevicesInOne))
+        };
         return RefreshIndicator(
           onRefresh: () => _refresh(context),
           child: ListView(
             children: [
               DropdownButton(
                 value: state.periodic,
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: Periodic.daily,
-                    child: Text("Daily"),
+                    child: Text(
+                        "Daily: ${DateTime.now().toIso8601String().substring(0, 7)}"),
                   ),
                   DropdownMenuItem(
                     value: Periodic.monthly,
-                    child: Text("Monthly"),
+                    child: Text(
+                        "Monthly: ${DateTime.now().toIso8601String().substring(0, 4)}"),
                   ),
-                  DropdownMenuItem(
+                  const DropdownMenuItem(
                     value: Periodic.yearly,
                     child: Text("Yearly"),
                   ),
@@ -40,15 +68,50 @@ class ReportView extends StatelessWidget {
                   context.read<HomeBloc>().add(ChangePeriodicEvent(value!));
                 },
               ),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  const RotationTransition(
+                    turns: AlwaysStoppedAnimation(-15 / 360),
+                    child: Opacity(
+                      opacity: 0.5,
+                      child: Text(
+                        "Example",
+                        style: TextStyle(fontSize: 64),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 200,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 16.0, top: 16.0),
+                      child: switch (state.periodic) {
+                        Periodic.daily => _DailyLineChart(data: _daysData),
+                        Periodic.monthly =>
+                          _MonthlyLineChart(data: _monthlyData),
+                        Periodic.yearly => _YearlyLineChart(data: _yearsData),
+                      },
+                    ),
+                  ),
+                ],
+              ),
               SizedBox(
-                height: 200,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 16.0, top: 16.0),
-                  child: switch (state.periodic) {
-                    Periodic.daily => _DailyLineChart(data: _daysData),
-                    Periodic.monthly => _MonthlyLineChart(data: _monthlyData),
-                    Periodic.yearly => _YearlyLineChart(data: _yearsData),
-                  },
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(allDevicesInOne.id),
+                    SizedBox(
+                      height: 200,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          right: 16.0,
+                          top: 16.0,
+                        ),
+                        child: allDevicesLineChart,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               ListView.builder(
@@ -60,9 +123,9 @@ class ReportView extends StatelessWidget {
                   final Device device = state.props[index];
                   final Widget lineChart = switch (state.periodic) {
                     Periodic.daily =>
-                      _DailyLineChart(data: _monthlyChartData(device)),
+                      _DailyLineChart(data: _dailyChartData(device)),
                     Periodic.monthly =>
-                      _MonthlyLineChart(data: _dailyChartData(device)),
+                      _MonthlyLineChart(data: _monthlyChartData(device)),
                     Periodic.yearly =>
                       _YearlyLineChart(data: _yearlyChartData(device))
                   };
