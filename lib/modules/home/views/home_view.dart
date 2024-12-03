@@ -210,6 +210,14 @@ class _DeviceCard extends StatelessWidget {
                     .bodySmall
                     ?.copyWith(color: color),
                 softWrap: true,
+              ),
+              Text(
+                device.id,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(color: color),
+                softWrap: true,
               )
             ],
           ),

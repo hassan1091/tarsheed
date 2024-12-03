@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +14,6 @@ import 'package:tarsheed/modules/main/main_screen.dart';
 import 'package:tarsheed/modules/profile/bloc/profile_bloc.dart';
 import 'package:tarsheed/modules/profile/profile_screen.dart';
 import 'package:tarsheed/services/firebase/auth_firebase_service.dart';
-import 'package:tarsheed/shared/themes/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,22 +25,57 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final PageController _pageController = PageController(initialPage: 1);
   late int selectedIndex;
+  StreamSubscription? _messageSubscription;
+  StreamSubscription? _openedAppSubscription;
 
   @override
   void initState() {
-    selectedIndex = _pageController.initialPage;
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (message.notification != null) {
-        AppTheme.showSnackBar(context, message.notification!.body ?? "");
-        context.read<HomeBloc>().add(LoadHomeEvent());
-      }
-    });
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      if (message.notification != null) {
-        context.read<HomeBloc>().add(LoadHomeEvent());
-      }
-    });
     super.initState();
+
+    selectedIndex = _pageController.initialPage;
+
+    _messageSubscription = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.notification != null) {
+        _showNotificationSnackBar(
+            message.notification!.body ?? "New notification");
+        _triggerBlocRefresh();
+      }
+    });
+
+    _openedAppSubscription = FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      if (message.notification != null) {
+        _triggerBlocRefresh();
+      }
+    });
+  }
+
+  void _showNotificationSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
+
+  void _triggerBlocRefresh() {
+    // Only trigger state updates without direct UI interaction
+    if (mounted) {
+      try {
+        if(context.read<HomeBloc>().state is! HomeLoadingState) {
+          context.read<HomeBloc>().add(LoadHomeEvent());
+        }
+      } catch (e, stackTrace) {
+        debugPrint('Error refreshing page: $e\n$stackTrace');
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _messageSubscription?.cancel();
+    _openedAppSubscription?.cancel();
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -84,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text(
-                  "Safe Mode Is Active",
+                  "Saving Mode Is Active",
                   style: TextStyle(fontWeight: FontWeight.w900),
                 ),
               ),
