@@ -23,7 +23,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       AddLinkHomeEvent event, Emitter<HomeState> emit) async {
     emit(HomeLoadingState());
     try {
-      currentDevices = await FirebaseService().addDeviceLink(event.deviceId);
+      currentDevices = await FirebaseService().addDeviceLink(event.deviceId, event.description);
       emit(HomeSuccessState(devices: currentDevices));
     } on CustomException catch (e) {
       emit(HomeErrorState(e.message));

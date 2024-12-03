@@ -7,8 +7,9 @@ sealed class HomeEvent extends Equatable {
 
 class AddLinkHomeEvent extends HomeEvent {
   final String deviceId;
+  final String description;
 
-  AddLinkHomeEvent(this.deviceId);
+  AddLinkHomeEvent(this.deviceId, this.description);
 }
 
 class ChangePeriodicEvent extends HomeEvent {

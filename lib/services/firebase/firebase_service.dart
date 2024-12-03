@@ -133,7 +133,8 @@ class FirebaseService {
     }
   }
 
-  Future<List<Device>> addDeviceLink(String deviceId) async {
+  Future<List<Device>> addDeviceLink(
+      String deviceId, String description) async {
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -153,6 +154,8 @@ class FirebaseService {
         "device_id": deviceRef,
         "user_id": uid,
       });
+
+      await deviceRef.update({"description": description});
 
       return await getUserDevices();
     } catch (e) {
