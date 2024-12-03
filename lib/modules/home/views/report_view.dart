@@ -369,9 +369,9 @@ class _DailyLineChart extends StatelessWidget {
             getTitlesWidget: (value, meta) {
               if (yAxisIntervals.contains(value.toInt())) {
                 return Text(
-                  '${value.toInt()}',
+                  '${value.toInt()}kWh',
                   style: const TextStyle(
-                      fontWeight: FontWeight.w500, fontSize: 10),
+                      fontWeight: FontWeight.w500, fontSize: 8),
                 );
               }
               return const SizedBox.shrink();
@@ -464,9 +464,9 @@ class _MonthlyLineChart extends StatelessWidget {
             getTitlesWidget: (value, meta) {
               if (yAxisIntervals.contains(value.toInt())) {
                 return Text(
-                  '${value.toInt()}',
+                  '${value.toInt()}kWh',
                   style: const TextStyle(
-                      fontWeight: FontWeight.w500, fontSize: 10),
+                      fontWeight: FontWeight.w500, fontSize: 8),
                 );
               }
               return const SizedBox.shrink();
@@ -576,9 +576,9 @@ class _YearlyLineChart extends StatelessWidget {
             getTitlesWidget: (value, meta) {
               if (yAxisIntervals.contains(value.toInt())) {
                 return Text(
-                  '${value.toInt()}',
+                  '${value.toInt()}kWh',
                   style: const TextStyle(
-                      fontWeight: FontWeight.w500, fontSize: 10),
+                      fontWeight: FontWeight.w500, fontSize: 8),
                 );
               }
               return const SizedBox.shrink();
