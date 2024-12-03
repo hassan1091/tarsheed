@@ -127,11 +127,18 @@ class _ProfileForm extends StatelessWidget {
                 type: TextInputType.emailAddress,
               ),
               const Gap(16),
-              Switch(
-                value: isSafeMode,
-                onChanged: (_) {
-                  context.read<ProfileBloc>().add(SaveModeToggle());
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Text("Safa Mode"),
+                  const Gap(16),
+                  Switch(
+                    value: isSafeMode,
+                    onChanged: (_) {
+                      context.read<ProfileBloc>().add(SaveModeToggle());
+                    },
+                  ),
+                ],
               ),
               FilledButton(
                 onPressed: () => profilePressed(context),

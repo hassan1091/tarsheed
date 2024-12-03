@@ -23,7 +23,15 @@ class HomeView extends StatelessWidget {
           child: ListView(
             children: [
               _EnergyCard(usage: totalUsage),
-              const Gap(8),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    DateTime.now().toIso8601String().substring(0, 10),
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+              ),
               const Divider(
                 thickness: 0.5,
                 indent: 50,
@@ -72,6 +80,7 @@ class HomeView extends StatelessWidget {
 
   void _addLink(BuildContext context) {
     String input = "";
+    String description = "";
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -80,10 +89,18 @@ class HomeView extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16),
         backgroundColor: Theme.of(context).primaryColor,
         children: [
-          const Text("Device Code"),
+          const Text("Device Code *"),
           TextFormField(
             onChanged: (value) {
               input = value;
+            },
+          ),
+          const Gap(2),
+          const Text("Device Description"),
+          TextFormField(
+            maxLength: 24,
+            onChanged: (value) {
+              description = value;
             },
           ),
           const Gap(2),
@@ -97,8 +114,11 @@ class HomeView extends StatelessWidget {
                   child: const Text("cancel")),
               TextButton(
                   onPressed: () {
+                    if (input.isEmpty) return;
                     Navigator.pop(context); // Close the Simple Dialog
-                    context.read<HomeBloc>().add(AddLinkHomeEvent(input));
+                    context
+                        .read<HomeBloc>()
+                        .add(AddLinkHomeEvent(input, description));
                   },
                   child: const Text("confirm")),
             ],
@@ -131,7 +151,7 @@ class _EnergyCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("$usage k"),
+                Text("$usage kWh"),
                 const Text("Energy Usage"),
               ],
             ),
@@ -166,6 +186,10 @@ class _DeviceCard extends StatelessWidget {
       ];
       color = Theme.of(context).disabledColor;
     }
+    IconData deviceIcon = switch (device.name) {
+      "AC" => Icons.ac_unit,
+      _ => Icons.lightbulb_outline,
+    };
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GradientCard(
@@ -180,7 +204,7 @@ class _DeviceCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Icon(
-                    Icons.lightbulb_outline,
+                    deviceIcon,
                     size: 48,
                     color: color,
                   ),
@@ -194,14 +218,30 @@ class _DeviceCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const Gap(8),
-              Text(
-                device.name,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(color: color),
-                softWrap: true,
+              const Gap(0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      device.name,
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
+                          ?.copyWith(color: color),
+                      softWrap: true,
+                    ),
+                    Text(
+                      "${device.usage} kWh",
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall
+                          ?.copyWith(color: color),
+                      softWrap: true,
+                    ),
+                  ],
+                ),
               ),
               Text(
                 device.description,
@@ -227,6 +267,8 @@ class _DeviceCard extends StatelessWidget {
   }
 
   void toggleSwitch(BuildContext context, value) {
-    context.read<HomeBloc>().add(ToggleSwitchEvent(device, value));
+    if(context.read<HomeBloc>().state is! HomeLoadingState) {
+      context.read<HomeBloc>().add(ToggleSwitchEvent(device, value));
+    }
   }
 }
