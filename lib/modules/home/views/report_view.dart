@@ -114,46 +114,6 @@ class ReportView extends StatelessWidget {
                   ],
                 ),
               ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const ClampingScrollPhysics(
-                    parent: ClampingScrollPhysics()),
-                itemCount: state.props.length,
-                itemBuilder: (context, index) {
-                  final Device device = state.props[index];
-                  final Widget lineChart = switch (state.periodic) {
-                    Periodic.daily =>
-                      _DailyLineChart(data: _dailyChartData(device)),
-                    Periodic.monthly =>
-                      _MonthlyLineChart(data: _monthlyChartData(device)),
-                    Periodic.yearly =>
-                      _YearlyLineChart(data: _yearlyChartData(device))
-                  };
-
-                  return SizedBox(
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [Text(device.id), Text(device.name)],
-                        ),
-                        SizedBox(
-                          height: 200,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              right: 16.0,
-                              top: 16.0,
-                            ),
-                            child: lineChart,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
             ],
           ),
         );
@@ -320,7 +280,6 @@ class _DailyLineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final yAxisIntervals = calculateYAxisIntervals(data);
-
     return LineChart(
       LineChartData(
         lineBarsData: lineBarsData,
@@ -370,8 +329,8 @@ class _DailyLineChart extends StatelessWidget {
               if (yAxisIntervals.contains(value.toInt())) {
                 return Text(
                   '${value.toInt()}kWh',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w500, fontSize: 8),
+                  style:
+                      const TextStyle(fontWeight: FontWeight.w500, fontSize: 8),
                 );
               }
               return const SizedBox.shrink();
@@ -465,8 +424,8 @@ class _MonthlyLineChart extends StatelessWidget {
               if (yAxisIntervals.contains(value.toInt())) {
                 return Text(
                   '${value.toInt()}kWh',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w500, fontSize: 8),
+                  style:
+                      const TextStyle(fontWeight: FontWeight.w500, fontSize: 8),
                 );
               }
               return const SizedBox.shrink();
@@ -577,8 +536,8 @@ class _YearlyLineChart extends StatelessWidget {
               if (yAxisIntervals.contains(value.toInt())) {
                 return Text(
                   '${value.toInt()}kWh',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w500, fontSize: 8),
+                  style:
+                      const TextStyle(fontWeight: FontWeight.w500, fontSize: 8),
                 );
               }
               return const SizedBox.shrink();
