@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -6,22 +8,93 @@ import 'package:tarsheed/modules/home/blocs/home_bloc/home_bloc.dart';
 import 'package:tarsheed/shared/themes/app_theme.dart';
 import 'package:tarsheed/shared/widgets/gradient_card.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  late final TextEditingController roomController;
+  int selectedRoom = 0;
+
+  static const List<IconData> icons = [
+    Icons.home_outlined,
+    Icons.kitchen,
+    Icons.chair_outlined,
+    Icons.bed_outlined
+  ];
+  static const List<String> categories = [
+    "All Rooms",
+    "Kitchen",
+    "Living Room",
+    "Bedroom"
+  ];
+
+  @override
+  void initState() {
+    roomController = TextEditingController(text: "All Rooms");
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    roomController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeBloc, HomeState>(
       listener: _homeListener,
       builder: (context, state) {
+        List<Device> devices = state.props
+            .where(
+              (element) =>
+                  selectedRoom == 0 || element.room == categories[selectedRoom],
+            )
+            .toList();
         int totalUsage = 0;
-        for (Device d in state.props) {
+        for (Device d in devices) {
           totalUsage += d.usage;
         }
+
         return RefreshIndicator(
           onRefresh: () => _refresh(context),
           child: ListView(
             children: [
+              SizedBox(
+                height: 200,
+                width: double.infinity,
+                child: ListView.builder(
+                  itemCount: icons.length,
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        right: index != icons.length - 1 ? 8 : 0,
+                      ),
+                      child: _RoomCard(
+                        icon: icons[index],
+                        category: categories[index],
+                        isSelected: index == selectedRoom,
+                        onTap: () {
+                          setState(() {
+                            selectedRoom = index;
+                          });
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const Divider(
+                thickness: 0.5,
+                indent: 50,
+                endIndent: 50,
+              ),
               _EnergyCard(usage: totalUsage),
               Center(
                 child: Padding(
@@ -32,12 +105,8 @@ class HomeView extends StatelessWidget {
                   ),
                 ),
               ),
-              const Divider(
-                thickness: 0.5,
-                indent: 50,
-                endIndent: 50,
-              ),
               IconButton(
+                  padding: EdgeInsets.zero,
                   onPressed: () => _addLink(context),
                   icon: const Icon(
                     Icons.add_link,
@@ -51,9 +120,9 @@ class HomeView extends StatelessWidget {
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 215),
                 itemBuilder: (context, index) {
-                  return _DeviceCard(device: state.props[index]);
+                  return _DeviceCard(device: devices[index]);
                 },
-                itemCount: state.props.length,
+                itemCount: devices.length,
               )
             ],
           ),
@@ -104,6 +173,30 @@ class HomeView extends StatelessWidget {
             },
           ),
           const Gap(2),
+          Align(
+            child: DropdownMenu(
+              controller: roomController,
+              dropdownMenuEntries: const [
+                DropdownMenuEntry(
+                  value: "All Rooms",
+                  label: "All Rooms",
+                ),
+                DropdownMenuEntry(
+                  value: "Kitchen",
+                  label: "Kitchen",
+                ),
+                DropdownMenuEntry(
+                  value: "Living Room",
+                  label: "Living Room",
+                ),
+                DropdownMenuEntry(
+                  value: "Bedroom",
+                  label: "Bedroom",
+                ),
+              ],
+            ),
+          ),
+          const Gap(2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -116,14 +209,72 @@ class HomeView extends StatelessWidget {
                   onPressed: () {
                     if (input.isEmpty) return;
                     Navigator.pop(context); // Close the Simple Dialog
-                    context
-                        .read<HomeBloc>()
-                        .add(AddLinkHomeEvent(input, description));
+                    context.read<HomeBloc>().add(AddLinkHomeEvent(
+                          input,
+                          description,
+                          roomController.text,
+                        ));
                   },
                   child: const Text("confirm")),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RoomCard extends StatelessWidget {
+  final IconData icon;
+  final String category;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _RoomCard({
+    required this.icon,
+    required this.category,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 150,
+      height: 150,
+      child: InkWell(
+        onTap: onTap,
+        child: ImageFiltered(
+          imageFilter: ImageFilter.blur(
+            sigmaY: isSelected ? 0 : 2,
+            tileMode: TileMode.repeated,
+          ),
+          child: Card(
+            color: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(
+                color: isSelected ? Colors.white : Colors.transparent,
+                width: 4,
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: GradientCard(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, size: 128),
+                  Text(
+                    category,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -267,7 +418,7 @@ class _DeviceCard extends StatelessWidget {
   }
 
   void toggleSwitch(BuildContext context, value) {
-    if(context.read<HomeBloc>().state is! HomeLoadingState) {
+    if (context.read<HomeBloc>().state is! HomeLoadingState) {
       context.read<HomeBloc>().add(ToggleSwitchEvent(device, value));
     }
   }

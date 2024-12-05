@@ -94,14 +94,15 @@ class FirebaseService {
       // Check if there are any device IDs to query
       if (querySnapshot.docs.isEmpty) return [];
 
-      final deviceIds =
-          querySnapshot.docs.map((doc) => doc.data()["device_id"].id);
+      final devicesInfo = querySnapshot.docs.map((doc) {
+        return {"id": doc.data()["device_id"].id, "room": doc.data()["room"]};
+      });
 
       List<Device> devices = [];
-      for (var deviceId in deviceIds) {
+      for (var deviceInfo in devicesInfo) {
         final deviceDoc = await db
             .collection("devices")
-            .doc(deviceId)
+            .doc(deviceInfo["id"])
             .withConverter(
               fromFirestore: Device.fromFirestore,
               toFirestore: Device.toFirestore,
@@ -113,7 +114,7 @@ class FirebaseService {
 
           final historySnapshot = await db
               .collection("devices")
-              .doc(deviceId)
+              .doc(deviceInfo["id"])
               .collection("device_usage")
               .orderBy("created_at", descending: true)
               .withConverter(
@@ -124,6 +125,7 @@ class FirebaseService {
 
           // Convert the history documents to DeviceHistory
           device.history = historySnapshot.docs.map((e) => e.data()).toList();
+          device.room = deviceInfo["room"];
           devices.add(device);
         }
       }
@@ -134,7 +136,7 @@ class FirebaseService {
   }
 
   Future<List<Device>> addDeviceLink(
-      String deviceId, String description) async {
+      String deviceId, String description, String room) async {
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -153,6 +155,7 @@ class FirebaseService {
       await db.collection("users_has_devices").add({
         "device_id": deviceRef,
         "user_id": uid,
+        "room": room,
       });
 
       await deviceRef.update({"description": description});

@@ -4,6 +4,7 @@ class Device {
   final String id;
   final String description;
   List<DeviceHistory>? history;
+  String? room;
   final int usage;
   final String name;
   final String status;
@@ -13,6 +14,7 @@ class Device {
     required this.id,
     required this.description,
     this.history,
+    this.room,
     required this.usage,
     required this.name,
     required this.status,
