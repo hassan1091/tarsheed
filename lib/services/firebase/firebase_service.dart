@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tarsheed/config/app_local_storage.dart';
 import 'package:tarsheed/core/constants/custom_exceptions.dart';
 import 'package:tarsheed/models/device.dart';
+import 'package:tarsheed/models/notification.dart';
 import 'package:tarsheed/models/profile.dart';
 import 'package:tarsheed/models/routine.dart';
 
@@ -130,6 +131,24 @@ class FirebaseService {
         }
       }
       return devices;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<Notification>> getNotifications() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+
+      final querySnapshot = await db
+          .collection("notifications")
+          .where("user_id", isEqualTo: uid)
+          .withConverter(
+            fromFirestore: Notification.fromFirestore,
+            toFirestore: Notification.toFirestore,
+          )
+          .get();
+      return querySnapshot.docs.map((e) => e.data()).toList();
     } catch (e) {
       rethrow;
     }
