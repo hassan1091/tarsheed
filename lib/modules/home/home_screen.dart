@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:tarsheed/core/constants/app_constants.dart';
 import 'package:tarsheed/core/constants/custom_exceptions.dart';
 import 'package:tarsheed/modules/home/blocs/home_bloc/home_bloc.dart';
@@ -11,6 +12,8 @@ import 'package:tarsheed/modules/home/views/home_view.dart';
 import 'package:tarsheed/modules/home/views/report_view.dart';
 import 'package:tarsheed/modules/home/views/routines_view.dart';
 import 'package:tarsheed/modules/main/main_screen.dart';
+import 'package:tarsheed/modules/notifications/bloc/notifications_bloc.dart';
+import 'package:tarsheed/modules/notifications/notifications_screen.dart';
 import 'package:tarsheed/modules/profile/bloc/profile_bloc.dart';
 import 'package:tarsheed/modules/profile/profile_screen.dart';
 import 'package:tarsheed/services/firebase/auth_firebase_service.dart';
@@ -34,7 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     selectedIndex = _pageController.initialPage;
 
-    _messageSubscription = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    _messageSubscription =
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (message.notification != null) {
         _showNotificationSnackBar(
             message.notification!.body ?? "New notification");
@@ -42,7 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
-    _openedAppSubscription = FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    _openedAppSubscription =
+        FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       if (message.notification != null) {
         _triggerBlocRefresh();
       }
@@ -61,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Only trigger state updates without direct UI interaction
     if (mounted) {
       try {
-        if(context.read<HomeBloc>().state is! HomeLoadingState) {
+        if (context.read<HomeBloc>().state is! HomeLoadingState) {
           context.read<HomeBloc>().add(LoadHomeEvent());
         }
       } catch (e, stackTrace) {
@@ -89,10 +94,32 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Text(AppConstants.appName),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => logout(context),
-          ),
+          PopupMenuButton(
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  child: const Row(
+                    children: [
+                      Icon(Icons.notifications_outlined),
+                      Gap(1),
+                      Text("Notifications"),
+                    ],
+                  ),
+                  onTap: () => notificationsPressed(context),
+                ),
+                PopupMenuItem(
+                  child: const Row(
+                    children: [
+                      Icon(Icons.logout),
+                      Gap(1),
+                      Text("Logout"),
+                    ],
+                  ),
+                  onTap: () => logout(context),
+                ),
+              ];
+            },
+          )
         ],
         leading: IconButton(
           icon: const Icon(CupertinoIcons.person_crop_circle),
@@ -181,6 +208,18 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context) => BlocProvider(
             create: (context) => ProfileBloc(),
             child: const ProfileScreen(),
+          ),
+        ));
+  }
+
+  Future<void> notificationsPressed(context) async {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider(
+            create: (context) =>
+                NotificationsBloc()..add(LoadNotificationsEvent()),
+            child: const NotificationsScreen(),
           ),
         ));
   }
